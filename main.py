@@ -7,7 +7,6 @@ from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from dotenv import load_dotenv
 
-from config import TOKEN, CHAT_ID
 from handlers.other import other_router
 from handlers.admin import admin_router
 

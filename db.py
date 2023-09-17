@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 import psycopg2
 
+
 class ConnectionBaseData:
 
     def __init__(self, host, user, password, db_name):
@@ -21,7 +22,6 @@ class ConnectionBaseData:
         except Exception as _ex:
             print("[INFO] error to connect data base")
 
-
     def close_connection(self):
         if self.connection_db:
             self.connection_db.close()
@@ -29,13 +29,12 @@ class ConnectionBaseData:
 
 @dataclass
 class User:
-
     name: str
     surname: str
 
+
 @dataclass
 class Car:
-
     license_plate: str
     model: str
     year_of_realease: str
@@ -44,8 +43,8 @@ class Car:
     type_of_car: str
     type_of_fuel: str
 
-class ManagerCars:
 
+class ManagerCars:
 
     def __init__(self, connection):
         self.connection = connection
@@ -78,7 +77,13 @@ class ManagerCars:
         except Exception as _ex:
             print("[INFO] error find car")
 
-
+    def update_car(self, car, name_column, new_value):
+        string_query = f"""
+                update car
+                set {name_column} = {new_value}
+                where license_plate = '{car[0]}'"""
+        with self.connection.cursor() as cursor:
+            cursor.execute(string_query)
 
     def check_connection(self):
         with self.connection.cursor() as cursor:

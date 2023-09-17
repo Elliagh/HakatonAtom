@@ -47,15 +47,22 @@ def print_all_cars():
     manager_cars = mc.ManagerCars(connection.connection_db)
     cars = manager_cars.get_all_cars()
     print(cars)
+    return  cars
 
 def find_car_by_number_sign(number_sign):
     connection = get_connection()
     manager_cars = mc.ManagerCars(connection.connection_db)
     car = manager_cars.get_info_by_license_plate(number_sign)
     print(car)
+    return car
 
-
+def update_car(car, name_column, new_value):
+    connection = get_connection()
+    manager_cars = mc.ManagerCars(connection.connection_db)
+    manager_cars.update_car(car, name_column, new_value)
 
 add_two_cars()
 print_all_cars()
+find_car = find_car_by_number_sign("fdasf")
+update_car(find_car, "model", "'sedan'")
 find_car_by_number_sign("fdasf")

@@ -1,9 +1,5 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 
-menu = [
-    [InlineKeyboardButton(text="Вколол инсулин", callback_data="injected_insulin")]
-]
-check_kb = InlineKeyboardMarkup(inline_keyboard=menu)
 
 admin_menu = [
     [KeyboardButton(text="Add new car")],

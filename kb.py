@@ -17,4 +17,4 @@ car_change_info = [
 ]
 
 admin_kb = ReplyKeyboardMarkup(keyboard=admin_menu, resize_keyboard=True)
-change_info_kb = ReplyKeyboardMarkup(inline_keyboard=car_change_info)
+change_info_kb = ReplyKeyboardMarkup(keyboard=car_change_info, resize_keyboard=True)

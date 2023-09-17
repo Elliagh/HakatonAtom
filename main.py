@@ -7,7 +7,6 @@ from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from config import TOKEN, CHAT_ID
-from kb import check_kb
 from handlers.other import other_router
 from handlers.admin import admin_router
 
@@ -28,6 +27,9 @@ async def main():
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
 
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s:%(name)s: %(message)s")
     asyncio.run(main())
+
+

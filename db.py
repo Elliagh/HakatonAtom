@@ -4,7 +4,7 @@ import psycopg2
 
 class ConnectionBaseData:
 
-    def init(self, host, user, password, db_name):
+    def __init__(self, host, user, password, db_name):
         self.host = host
         self.user = user
         self.password = password
@@ -47,7 +47,7 @@ class Car:
 class ManagerCars:
 
 
-    def init(self, connection):
+    def __init__(self, connection):
         self.connection = connection
 
     def add_new_car(self, car):

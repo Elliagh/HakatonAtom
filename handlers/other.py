@@ -2,7 +2,7 @@ from aiogram import types, F, Router
 from aiogram.types import Message
 from aiogram.filters import Command
 
-from kb import check_kb, admin_kb
+from kb import admin_kb
 
 other_router = Router()
 

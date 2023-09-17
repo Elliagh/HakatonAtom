@@ -1,28 +1,66 @@
-import asyncio
+from dataclasses import dataclass
 
-import asyncpg
+import psycopg2
 
-async def add_new_car(car_info: dict):
-    
-    conn = await asyncpg.connect(
-        host="localhost",
-        database="postgres",
-        user="postgres",
-        password="12345678",
-        port=5432
-    )
+class ConnectionBaseData:
 
-    get_drivers_query = "SELECT * FROM driver"
+    def init(self, host, user, password, db_name):
+        self.host = host
+        self.user = user
+        self.password = password
+        self.db_name = db_name
+        try:
+            self.connection_db = psycopg2.connect(
+                host=self.host,
+                user=self.user,
+                password=self.password,
+                database=self.db_name
+            )
 
-    result = await conn.fetch(get_drivers_query)
-    
-    await conn.close()
+            self.connection_db.autocommit = True
+        except Exception as _ex:
+            print("[INFO] error to connect data base")
 
-async def change_car_info(info_to_change: dict):
-    pass
 
-async def delete_car(license_plate: str):
-    pass
+    def close_connection(self):
+        if self.connection_db:
+            self.connection_db.close()
 
-asyncio.run(add_new_car({"1":1}))
 
+@dataclass
+class User:
+
+    name: str
+    surname: str
+
+@dataclass
+class Car:
+
+    license_plate: str
+    model: str
+    year_of_realease: str
+    mileage: int
+    amount_of_fuel: int
+    type_of_car: str
+    type_of_fuel: str
+
+class ManagerCars:
+
+
+    def init(self, connection):
+        self.connection = connection
+
+    def add_new_car(self, car):
+        try:
+            string_query = f"""INSERT INTO car (license_plate, model, year_of_realease, mileage, amount_of_fuel, type_of_car, type_of_fuel)
+                            VALUES('{car.license_plate}', '{car.model}', '{car.year_of_realease}', 
+                                    {car.mileage}, {car.amount_of_fuel}, '{car.type_of_car}', '{car.type_of_fuel}');"""
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+        except Exception as _ex:
+            print("[INFO] error to add data car")
+
+    def check_connection(self):
+        with self.connection.cursor() as cursor:
+            cursor.execute("select version()")
+            print(f"Server version {cursor.fetchone()}")

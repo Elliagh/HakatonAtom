@@ -47,7 +47,7 @@ def print_all_cars():
     manager_cars = mc.ManagerCars(connection.connection_db)
     cars = manager_cars.get_all_cars()
     print(cars)
-    return  cars
+    return cars
 
 def find_car_by_number_sign(number_sign):
     connection = get_connection()

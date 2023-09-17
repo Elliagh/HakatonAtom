@@ -46,6 +46,8 @@ class Car:
 
 class ManagerCars:
 
+
+
     def __init__(self, connection):
         self.connection = connection
 
@@ -64,7 +66,11 @@ class ManagerCars:
             string_query = "select * from car"
             with self.connection.cursor() as cursor:
                 cursor.execute(string_query)
-                return cursor.fetchall()
+                raw_cars = cursor.fetchall()
+                result_cars = []
+                for raw_car in raw_cars:
+                    result_cars.append(self.convert_tuple_to_car(raw_car))
+                return result_cars
         except Exception as _ex:
             print("[INFO] error to get cars")
 
@@ -73,7 +79,9 @@ class ManagerCars:
             string_query = f"select * from car where license_plate = '{number_sign}'"
             with self.connection.cursor() as cursor:
                 cursor.execute(string_query)
-                return cursor.fetchone()
+                raw_car = cursor.fetchone()
+                result_car = self.convert_tuple_to_car(raw_car)
+                return result_car
         except Exception as _ex:
             print("[INFO] error find car")
 
@@ -81,7 +89,7 @@ class ManagerCars:
         string_query = f"""
                 update car
                 set {name_column} = {new_value}
-                where license_plate = '{car[0]}'"""
+                where license_plate = '{car.license_plate}'"""
         with self.connection.cursor() as cursor:
             cursor.execute(string_query)
 
@@ -89,3 +97,18 @@ class ManagerCars:
         with self.connection.cursor() as cursor:
             cursor.execute("select version()")
             print(f"Server version {cursor.fetchone()}")
+
+
+    def convert_tuple_to_car(self, tuple_car):
+        car = Car(
+            license_plate=tuple_car[0],
+            model=tuple_car[1],
+            year_of_realease=tuple_car[2],
+            mileage=tuple_car[3],
+            amount_of_fuel=tuple_car[4],
+            type_of_car=tuple_car[5],
+            type_of_fuel=tuple_car[6]
+        )
+        return car
+
+

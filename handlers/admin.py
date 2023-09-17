@@ -3,9 +3,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram import types, F, Router
 from aiogram.types import Message
-from aiogram.filters import Command
 
 from kb import admin_kb
+from db import ManagerCars
+from db import Car
 
 admin_router = Router()
 
@@ -94,6 +95,9 @@ async def process_type_of_fuel(msg: Message, state: FSMContext):
     data = await state.get_data()
     await state.clear()
     
+    new_car = Car(*data.values())
+
+    manager = ManagerCars()
 
     await msg.answer("Машина добавлена в базу данных", reply_markup=admin_kb)    
 

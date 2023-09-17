@@ -1,23 +1,25 @@
 import asyncio
-import datetime
+import os
 import logging
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
+from dotenv import load_dotenv
 
 from config import TOKEN, CHAT_ID
 from kb import check_kb
 from handlers.other import other_router
 from handlers.admin import admin_router
 
+load_dotenv()
 
 async def on_startup():
     pass
 
 async def main():
 
-    bot = Bot(token=TOKEN, parse_mode=ParseMode.HTML)
+    bot = Bot(token=os.getenv('TOKEN'), parse_mode=ParseMode.HTML)
     dp = Dispatcher(storage=MemoryStorage())
 
     # initialize routers

@@ -50,7 +50,7 @@ class ManagerCars:
     def init(self, connection):
         self.connection = connection
 
-    def add_new_car(self, car):
+    def add_new_car(self, car: Car):
         try:
             string_query = f"""INSERT INTO car (license_plate, model, year_of_realease, mileage, amount_of_fuel, type_of_car, type_of_fuel)
                             VALUES('{car.license_plate}', '{car.model}', '{car.year_of_realease}', 

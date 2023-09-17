@@ -85,6 +85,17 @@ class ManagerCars:
         except Exception as _ex:
             print("[INFO] error find car")
 
+    def get_mileage(self, number_sign):
+        try:
+            string_query = f"select * from car where license_plate = '{number_sign}'"
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+                raw_car = cursor.fetchone()
+                result_car = self.convert_tuple_to_car(raw_car)
+                return result_car.mileage
+        except Exception as _ex:
+            print("[INFO] error find car")
+
     def update_car(self, car, name_column, new_value):
         string_query = f"""
                 update car
@@ -97,6 +108,18 @@ class ManagerCars:
         with self.connection.cursor() as cursor:
             cursor.execute("select version()")
             print(f"Server version {cursor.fetchone()}")
+
+    def cost_usage(self, car):
+        try:
+            string_query = f"select cost from fuel_info where name = '{car.type_of_fuel}'"
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+                cost = cursor.fetchone()
+                if cost is not None:
+                    return car.mileage*cost[0]
+
+        except Exception as _ex:
+            print("[INFO] fuel not found")
 
 
     def convert_tuple_to_car(self, tuple_car):

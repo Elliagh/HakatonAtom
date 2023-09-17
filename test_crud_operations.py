@@ -37,7 +37,7 @@ def add_two_cars():
         "2000",
         "300",
         "carshering",
-        "dizel"
+        "ai-80"
     )
     manager_cars.add_new_car(second_car)
 
@@ -61,8 +61,16 @@ def update_car(car, name_column, new_value):
     manager_cars = mc.ManagerCars(connection.connection_db)
     manager_cars.update_car(car, name_column, new_value)
 
+def calculate_cost_usage_car(car):
+    connection = get_connection()
+    manager_cars = mc.ManagerCars(connection.connection_db)
+    cost = manager_cars.cost_usage(car)
+    print(cost)
+    return cost
+
 add_two_cars()
 print_all_cars()
 find_car = find_car_by_number_sign("fdasf")
 update_car(find_car, "model", "'sedan'")
-find_car_by_number_sign("fdasf")
+find_car = find_car_by_number_sign("fdasf")
+calculate_cost_usage_car(find_car)

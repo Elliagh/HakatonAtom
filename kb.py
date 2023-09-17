@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from aiogram.types import KeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 
 
 admin_menu = [
@@ -8,13 +8,13 @@ admin_menu = [
 ]
 
 car_change_info = [
-    [InlineKeyboardButton(text="Модель машины")],
-    [InlineKeyboardButton(text="Год выпуска")],
-    [InlineKeyboardButton(text="Пробег")],
-    [InlineKeyboardButton(text="Количество топлива")],
-    [InlineKeyboardButton(text="Тип машины")],
-    [InlineKeyboardButton(text="Тип топлива")]
+    [KeyboardButton(text="Модель машины")],
+    [KeyboardButton(text="Год выпуска")],
+    [KeyboardButton(text="Пробег")],
+    [KeyboardButton(text="Количество топлива")],
+    [KeyboardButton(text="Тип машины")],
+    [KeyboardButton(text="Тип топлива")]
 ]
 
 admin_kb = ReplyKeyboardMarkup(keyboard=admin_menu, resize_keyboard=True)
-change_info_kb = InlineKeyboardMarkup(inline_keyboard=car_change_info)
+change_info_kb = ReplyKeyboardMarkup(inline_keyboard=car_change_info)

@@ -60,6 +60,26 @@ class ManagerCars:
         except Exception as _ex:
             print("[INFO] error to add data car")
 
+    def get_all_cars(self):
+        try:
+            string_query = "select * from car"
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+                return cursor.fetchall()
+        except Exception as _ex:
+            print("[INFO] error to get cars")
+
+    def get_info_by_license_plate(self, number_sign):
+        try:
+            string_query = f"select * from car where license_plate = '{number_sign}'"
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+                return cursor.fetchone()
+        except Exception as _ex:
+            print("[INFO] error find car")
+
+
+
     def check_connection(self):
         with self.connection.cursor() as cursor:
             cursor.execute("select version()")

@@ -7,8 +7,8 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram import types, F, Router
 from aiogram.types import Message
 from kb import change_info_kb, base_kb
-from db import ManagerCars
-from db import Car
+from simulator import sim_manager, Simulation
+
 import db
 from kb import base_kb, user_kb, cancel_car_kb
 from aiogram import types, F, Router
@@ -27,8 +27,6 @@ class DiselectCar(StatesGroup):
     license_plate = State()
     password = State()
 
-
-# TODO Выбор машины
 
 @driver_router.message(F.text == "Driver")
 async def driver_hello(msg: Message):
@@ -52,7 +50,11 @@ async def process_license_plate(msg: Message, state: FSMContext):
     car = manager_cars.get_info_by_license_plate(data["license_plate"])
     manager_cars.capture_car(data["license_plate"])
     manager_cars.add_secret(data["license_plate"], secret)
+
     await msg.answer(info_about_car(car) + "\n" + "pass:" + secret, reply_markup=cancel_car_kb)
+
+    simulation = Simulation(1, 100)
+    await sim_manager.add_simulation(msg.from_user.id, simulation)
 
 
 # Diselect
@@ -81,6 +83,8 @@ async def diselect_car(msg: Message, state: FSMContext):
         await  msg.answer("wrong secret", reply_markup=cancel_car_kb)
     else:
         await  msg.answer("it is all", reply_markup=base_kb)
+
+        sim_manager.stop_simulation(msg.from_user.id)
 
 
 @driver_router.message(F.text == "Show List available cars")

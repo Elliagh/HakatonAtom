@@ -1,5 +1,9 @@
 from aiogram.types import KeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 
+user_menu = [
+    [KeyboardButton(text="Select car")],
+    [KeyboardButton(text="Show List available cars")]
+]
 
 admin_menu = [
     [KeyboardButton(text="Add new car")],
@@ -22,6 +26,7 @@ base_menu = [
     [KeyboardButton(text="Admin")]
 ]
 
+user_kb = ReplyKeyboardMarkup(keyboard=user_menu, resize_keyboard=True)
 admin_kb = ReplyKeyboardMarkup(keyboard=admin_menu, resize_keyboard=True)
 change_info_kb = ReplyKeyboardMarkup(keyboard=car_change_info, resize_keyboard=True)
 base_kb = ReplyKeyboardMarkup(keyboard=base_menu, resize_keyboard=True)

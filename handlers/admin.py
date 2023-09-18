@@ -126,7 +126,7 @@ async def process_type_of_fuel(msg: Message, state: FSMContext):
     manager_cars = db.ManagerCars(connect.connection_db)
     manager_cars.add_new_car(new_car)
 
-    await msg.answer("Машина добавлена в базу данных", reply_markup=admin_kb)
+    await msg.answer("Машина добавлена в базу данных", reply_markup=base_kb)
 
 
 # Change Info FSM

@@ -18,7 +18,6 @@ class SimulationManager():
     async def add_simulation(self, driver_id: int, simulation):
         self.active_simulations_list[driver_id] = simulation
 
-        loop = asyncio.get_event_loop()
         await simulation.run_simulation()
 
     async def get_simulation_info(self, driver_id: int):
@@ -80,7 +79,7 @@ class Simulation():
             await self.write_info_from_display()
             await self.write_info_from_engine()
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.5)
 
         self.notifier.stop()
         self.bus.shutdown()
@@ -157,11 +156,3 @@ def print_message(msg: can.Message) -> None:
 
 
 sim_manager = SimulationManager()
-
-async def main():
-    simulation = Simulation(1, 50)
-    await sim_manager.add_simulation(1, simulation)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

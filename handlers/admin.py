@@ -7,6 +7,7 @@ from aiogram.types import Message
 from kb import admin_kb, change_info_kb
 from db import ManagerCars
 from db import Car
+import db
 
 admin_router = Router()
 
@@ -99,9 +100,13 @@ async def process_type_of_fuel(msg: Message, state: FSMContext):
     data = await state.get_data()
     await state.clear()
     
-    new_car = Car(*data.values())
+    new_car = new_car = Car(*data.values())
+    connect = db.get_connection()
+    print(new_car)
+    manager_cars = db.ManagerCars(connect.connection_db)
+    manager_cars.add_new_car(new_car)
 
-    await msg.answer("Машина добавлена в базу данных", reply_markup=admin_kb)    
+    await msg.answer("Машина добавлена в базу данных", reply_markup=admin_kb)
 
 
 # Change Info FSM

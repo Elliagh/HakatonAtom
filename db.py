@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+import json
 import psycopg2
 
 
@@ -13,6 +13,7 @@ class ConnectionBaseData:
         try:
             self.connection_db = psycopg2.connect(
                 host=self.host,
+                port=5432,
                 user=self.user,
                 password=self.password,
                 database=self.db_name
@@ -37,7 +38,7 @@ class User:
 class Car:
     license_plate: str
     model: str
-    year_of_realease: str
+    year_of_release: str
     mileage: int
     amount_of_fuel: int
     type_of_car: str
@@ -54,8 +55,9 @@ class ManagerCars:
     def add_new_car(self, car: Car):
         try:
             string_query = f"""INSERT INTO car (license_plate, model, year_of_realease, mileage, amount_of_fuel, type_of_car, type_of_fuel)
-                            VALUES('{car.license_plate}', '{car.model}', '{car.year_of_realease}', 
+                            VALUES('{car.license_plate}', '{car.model}', '{car.year_of_release}', 
                                     {car.mileage}, {car.amount_of_fuel}, '{car.type_of_car}', '{car.type_of_fuel}');"""
+            print(string_query)
             with self.connection.cursor() as cursor:
                 cursor.execute(string_query)
         except Exception as _ex:
@@ -126,7 +128,7 @@ class ManagerCars:
         car = Car(
             license_plate=tuple_car[0],
             model=tuple_car[1],
-            year_of_realease=tuple_car[2],
+            year_of_release=tuple_car[2],
             mileage=tuple_car[3],
             amount_of_fuel=tuple_car[4],
             type_of_car=tuple_car[5],
@@ -135,3 +137,14 @@ class ManagerCars:
         return car
 
 
+
+def get_connection():
+    with open('ConnectionInfo.json', 'r') as connection_json:
+        connection_data = json.load(connection_json)
+        connection = ConnectionBaseData(
+            host=connection_data["host"],
+            user=connection_data["user"],
+            password=connection_data["password"],
+            db_name=connection_data["db_name"]
+        )
+        return connection

@@ -2,19 +2,8 @@ import json
 import db as mc
 
 
-def get_connection():
-    with open('ConnectionInfo.json', 'r') as connection_json:
-        connection_data = json.load(connection_json)
-        connection = mc.ConnectionBaseData(
-            host=connection_data["host"],
-            user=connection_data["user"],
-            password=connection_data["password"],
-            db_name=connection_data["db_name"]
-        )
-        return connection
-
 def add_two_cars():
-    connection = get_connection()
+    connection = mc.get_connection()
     manager_cars = mc.ManagerCars(connection.connection_db)
     manager_cars.check_connection()
 
@@ -28,41 +17,41 @@ def add_two_cars():
         "dizel"
     )
 
-    manager_cars.add_new_car(new_car);
+    manager_cars.add_new_car(new_car)
 
     second_car = mc.Car(
-        "fdasf",
-        "gas",
-        "2002-05-05",
-        "2000",
-        "300",
-        "carshering",
-        "ai-80"
+        'fdasf',
+        'gas',
+        '2002-05-05',
+        '2000',
+        '300',
+        'Каршеринг',
+        'ai-80'
     )
     manager_cars.add_new_car(second_car)
 
 
 def print_all_cars():
-    connection = get_connection()
+    connection = mc.get_connection()
     manager_cars = mc.ManagerCars(connection.connection_db)
     cars = manager_cars.get_all_cars()
     print(cars)
     return cars
 
 def find_car_by_number_sign(number_sign):
-    connection = get_connection()
+    connection = mc.get_connection()
     manager_cars = mc.ManagerCars(connection.connection_db)
     car = manager_cars.get_info_by_license_plate(number_sign)
     print(car)
     return car
 
 def update_car(car, name_column, new_value):
-    connection = get_connection()
+    connection = mc.get_connection()
     manager_cars = mc.ManagerCars(connection.connection_db)
     manager_cars.update_car(car, name_column, new_value)
 
 def calculate_cost_usage_car(car):
-    connection = get_connection()
+    connection = mc.get_connection()
     manager_cars = mc.ManagerCars(connection.connection_db)
     cost = manager_cars.cost_usage(car)
     print(cost)

@@ -120,13 +120,23 @@ async def process_type_of_fuel(msg: Message, state: FSMContext):
     data = await state.get_data()
     await state.clear()
     
-    new_car = Car(*data.values())
+    new_car = Car(
+        license_plate=data["license_plate"],
+        model=data["car_model"],
+        year_of_release=data["year_of_release"],
+        mileage=data["mileage"],
+        amount_of_fuel=data["amount_of_fuel"],
+        type_of_fuel=data["type_of_fuel"],
+        type_of_car=data["type_of_car"],
+        busy=False,
+        temp_sign="1234"
+    )
     connect = db.get_connection()
     print(new_car)
     manager_cars = db.ManagerCars(connect.connection_db)
     manager_cars.add_new_car(new_car)
 
-    await msg.answer("Машина добавлена в базу данных", reply_markup=admin_kb)
+    await msg.answer("Машина добавлена в базу данных", reply_markup=base_kb)
 
 
 # Change Info FSM

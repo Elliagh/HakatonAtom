@@ -100,7 +100,7 @@ async def process_type_of_fuel(msg: Message, state: FSMContext):
     data = await state.get_data()
     await state.clear()
     
-    new_car = new_car = Car(*data.values())
+    new_car = Car(*data.values())
     connect = db.get_connection()
     print(new_car)
     manager_cars = db.ManagerCars(connect.connection_db)
@@ -136,7 +136,22 @@ async def process_license_plate(msg: Message, state: FSMContext):
     await state.update_data(new_value=msg.text)
     data = await state.get_data()
 
-    # обновляю базу
+    license_plate_car = data["license_plate"]
+    raw_car_property = data["car_property"]
+    new_value = data["new_value"]
+    connect = db.get_connection()
+    manager_cars = db.ManagerCars(connect.connection_db)
+    find_car = manager_cars.get_info_by_license_plate(license_plate_car)
+
+    if raw_car_property != "Пробег" and raw_car_property != "Количество топлива":
+        car_property = "'" + raw_car_property
+        car_property = car_property + "'"
+    car_property = raw_car_property
+    manager_cars.update_car(
+        find_car,
+        car_property,
+        new_value
+    )
 
     await msg.answer("Информация успешно обновлена", reply_markup=admin_kb)
 
@@ -152,5 +167,7 @@ async def start_add_car(msg: Message, state: FSMContext):
 async def process_license_plate(msg: Message, state: FSMContext):
     await state.update_data(license_plate=msg.text)
     license_plate = await state.get_data()
-
+    connect = db.get_connection()
+    manager_cars = db.ManagerCars(connect.connection_db)
+    manager_cars.delete_car(license_plate["license_plate"])
     await msg.answer("Машина удалена из базы данных", reply_markup=admin_kb)

@@ -136,6 +136,16 @@ class ManagerCars:
         )
         return car
 
+    def delete_car(self, sign_number):
+        try:
+            string_query = f"""
+                delete from car 
+                where license_plate = '{sign_number}'"""
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+        except Exception as _ex:
+            print("[INFO] error delete car")
+
 
 
 def get_connection():

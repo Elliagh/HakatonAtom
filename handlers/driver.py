@@ -23,7 +23,7 @@ class SelectCar(StatesGroup):
     license_plate = State()
 
 
-class DeselectCar(StatesGroup):
+class DiselectCar(StatesGroup):
     license_plate = State()
     password = State()
 
@@ -45,30 +45,31 @@ async def select_car(msg: Message, state: FSMContext):
 async def process_license_plate(msg: Message, state: FSMContext):
     await state.update_data(license_plate=msg.text)
     data = await state.get_data()
+    await state.clear()
     secret = generate_random_string(15)
     connect = db.get_connection()
     manager_cars = db.ManagerCars(connect.connection_db)
     car = manager_cars.get_info_by_license_plate(data["license_plate"])
     manager_cars.capture_car(data["license_plate"])
     manager_cars.add_secret(data["license_plate"], secret)
-    await msg.answer(info_about_car(car), reply_markup=cancel_car_kb)
+    await msg.answer(info_about_car(car) + "\n" + "pass:" + secret, reply_markup=cancel_car_kb)
 
 
 # Diselect
 @driver_router.message(F.text == "Diselect")
 async def diselect_car(msg: Message, state: FSMContext):
-    await state.set_state(DeselectCar.license_plate)
+    await state.set_state(DiselectCar.license_plate)
     await msg.answer("write license_plate")
 
 
-@driver_router.message(DeselectCar.license_plate)
+@driver_router.message(DiselectCar.license_plate)
 async def diselect_car(msg: Message, state: FSMContext):
     await state.update_data(license_plate=msg.text)
-    await state.set_state(DeselectCar.password)
+    await state.set_state(DiselectCar.password)
     await msg.answer("write password")
 
 
-@driver_router.message(DeselectCar.password)
+@driver_router.message(DiselectCar.password)
 async def diselect_car(msg: Message, state: FSMContext):
     await state.update_data(password=msg.text)
     data = await state.get_data()

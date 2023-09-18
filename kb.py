@@ -5,6 +5,10 @@ user_menu = [
     [KeyboardButton(text="Show List available cars")]
 ]
 
+cancel_capture_car = [
+    [KeyboardButton(text="Diselect")]
+]
+
 admin_menu = [
     [KeyboardButton(text="Add new car")],
     [KeyboardButton(text="Change car info")],
@@ -26,6 +30,7 @@ base_menu = [
     [KeyboardButton(text="Admin")]
 ]
 
+cancel_car_kb = ReplyKeyboardMarkup(keyboard=cancel_capture_car, resize_keyboard=True)
 user_kb = ReplyKeyboardMarkup(keyboard=user_menu, resize_keyboard=True)
 admin_kb = ReplyKeyboardMarkup(keyboard=admin_menu, resize_keyboard=True)
 change_info_kb = ReplyKeyboardMarkup(keyboard=car_change_info, resize_keyboard=True)

@@ -7,7 +7,7 @@ from kb import change_info_kb, base_kb
 from db import ManagerCars
 from db import Car
 import db
-from kb import base_kb, user_kb
+from kb import base_kb, user_kb, cancel_car_kb
 from aiogram import types, F, Router
 from aiogram.types import Message
 from aiogram.fsm.state import State, StatesGroup
@@ -37,10 +37,11 @@ async def process_license_plate(msg: Message, state: FSMContext):
     connect = db.get_connection()
     manager_cars = db.ManagerCars(connect.connection_db)
     car = manager_cars.get_info_by_license_plate(data["license_plate"])
-    await msg.answer(info_about_car(car), reply_markup=base_kb)
+    manager_cars.capture_car(data["license_plate"], True)
+    await msg.answer(info_about_car(car), reply_markup=cancel_car_kb)
 
 @driver_router.message(F.text == "Show List available cars")
-async def show_list_car(msg: Message):
+async def show_list_car(msg: Message, state: FSMContext):
     connect = db.get_connection()
     manager_cars = db.ManagerCars(connect.connection_db)
     cars = manager_cars.get_all_cars()
@@ -50,6 +51,14 @@ async def show_list_car(msg: Message):
 
     await  msg.answer("it is all", reply_markup=base_kb)
 
+
+@driver_router.message(F.text == "Diselect")
+async def diselect_car(msg: Message, state: FSMContext):
+    data = await state.get_data()
+    connect = db.get_connection()
+    manager_cars = db.ManagerCars(connect.connection_db)
+    manager_cars.capture_car(data["license_plate"],False)
+    await  msg.answer("it is all", reply_markup=base_kb)
 
 def info_about_car(car):
     return f"""

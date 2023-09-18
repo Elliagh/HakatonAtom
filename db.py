@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import json
 import psycopg2
-
+from datetime import datetime
 
 class ConnectionBaseData:
 
@@ -145,6 +145,17 @@ class ManagerCars:
                 cursor.execute(string_query)
         except Exception as _ex:
             print("[INFO] error delete car")
+
+    def capture_car(self, sign_number, is_busy):
+        try:
+            string_query = f"""
+            update car
+            set busy = {is_busy}
+            where license_plate = '{sign_number}'"""
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+        except Exception as _ex:
+            print("[INFO] something went wrong")
 
 
 

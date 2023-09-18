@@ -3,6 +3,7 @@ import json
 import psycopg2
 from datetime import datetime
 
+
 class ConnectionBaseData:
 
     def __init__(self, host, user, password, db_name):
@@ -219,17 +220,22 @@ class AuntithicateUser:
             string_query = f"""select * from driver where name = '{name}' and password = '{password} and role = 'admin'"""
             with self.connection.cursor() as cursor:
                 cursor.execute(string_query)
-                result = cursor.fetchone()
-                if result is not None:
-                    return True
-                else:
-                    return False
         except Exception as _ex:
             print("[INFO] something went wrong")
 
     def register_user(self, name, login, password):
         try:
-            string_query = f"""insert into driver(name, surname, password, role) values('{name}', '{login}','{password}','user')"""
+            help_string = f"""select max(id) + 1 from driver"""
+            print(help_string)
+            id = 0
+            with self.connection.cursor() as cursor_help:
+                cursor_help.execute(help_string)
+                result = cursor_help.fetchone()
+                print(result)
+                if result is not None:
+                    id = result[0]
+            string_query = f"""insert into driver(id, name, surname, password, role) values({id},'{name}', '{login}','{password}','user')"""
+            print(string_query)
             with self.connection.cursor() as cursor:
                 cursor.execute(string_query)
         except Exception as _ex:

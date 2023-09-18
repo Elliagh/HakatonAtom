@@ -68,12 +68,13 @@ async def register_driver_input_password(msg: Message, state: FSMContext):
     data = await state.get_data()
     connect = db.get_connection()
     auth_user = db.AuntithicateUser(connect.connection_db)
-    resutl = auth_user.register_user(
+    await  state.clear()
+    auth_user.register_user(
         name = data["name"],
         login= data["surname"],
         password=data["password"]
     )
-    await  msg.answer(f"вы зареганы:{resutl}", reply_markup=auth_kb)
+    await  msg.answer(f"вы зареганы", reply_markup=auth_kb)
 
 @driver_router.message(F.text == "Login")
 async def driver_login(msg: Message, state: FSMContext):

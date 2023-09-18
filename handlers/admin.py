@@ -112,7 +112,7 @@ async def process_type_of_fuel(msg: Message, state: FSMContext):
 # Change Info FSM
 
 @admin_router.message(F.text == "Change car info")
-async def start_add_car(msg: Message, state: FSMContext):
+async def start_change_info(msg: Message, state: FSMContext):
     await state.set_state(ChangeCarInfo.car_license_plate)
     await msg.answer("Напиши номерной знак машины, у которой вы хотите поменять имнформацию", reply_markup=ReplyKeyboardRemove())
 
@@ -125,33 +125,35 @@ async def process_license_plate(msg: Message, state: FSMContext):
     await msg.answer("Выбери что хочешь изменить", reply_markup=change_info_kb)
 
 @admin_router.message(ChangeCarInfo.car_property)
-async def process_license_plate(msg: Message, state: FSMContext):
+async def process_car_property(msg: Message, state: FSMContext):
     await state.update_data(car_property=msg.text)
     await state.set_state(ChangeCarInfo.car_new_value)
 
-    await msg.answer("Напиши новое значение", reply_markup=ReplyKeyboardMarkup())
+    await msg.answer("Напиши новое значение", reply_markup=ReplyKeyboardRemove())
 
 @admin_router.message(ChangeCarInfo.car_new_value)
-async def process_license_plate(msg: Message, state: FSMContext):
+async def process_new_value(msg: Message, state: FSMContext):
     await state.update_data(new_value=msg.text)
     data = await state.get_data()
+    await state.clear()
 
     license_plate_car = data["license_plate"]
-    raw_car_property = data["car_property"]
+    car_property = data["car_property"]
     new_value = data["new_value"]
     connect = db.get_connection()
     manager_cars = db.ManagerCars(connect.connection_db)
     find_car = manager_cars.get_info_by_license_plate(license_plate_car)
-
-    if raw_car_property != "Пробег" and raw_car_property != "Количество топлива":
-        car_property = "'" + raw_car_property
-        car_property = car_property + "'"
-    car_property = raw_car_property
+    if car_property == "mileage" or car_property == "amount_of_fuel":
+        pass
+    else:
+        new_value = "'" + new_value + "'"
     manager_cars.update_car(
         find_car,
         car_property,
         new_value
     )
+
+    print(data)
 
     await msg.answer("Информация успешно обновлена", reply_markup=admin_kb)
 

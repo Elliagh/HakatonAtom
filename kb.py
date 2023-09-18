@@ -8,12 +8,12 @@ admin_menu = [
 ]
 
 car_change_info = [
-    [KeyboardButton(text="Модель машины")],
-    [KeyboardButton(text="Год выпуска")],
-    [KeyboardButton(text="Пробег")],
-    [KeyboardButton(text="Количество топлива")],
-    [KeyboardButton(text="Тип машины")],
-    [KeyboardButton(text="Тип топлива")]
+    [KeyboardButton(text="model")],
+    [KeyboardButton(text="year_of_realease")],
+    [KeyboardButton(text="mileage")],
+    [KeyboardButton(text="amount_of_fuel")],
+    [KeyboardButton(text="type_of_car")],
+    [KeyboardButton(text="type_of_fuel")]
 ]
 
 admin_kb = ReplyKeyboardMarkup(keyboard=admin_menu, resize_keyboard=True)

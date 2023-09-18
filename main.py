@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 from handlers.other import other_router
 from handlers.admin import admin_router
+from handlers.driver import driver_router
 
 
 load_dotenv()
@@ -24,6 +25,7 @@ async def main():
     # initialize routers
     dp.include_router(other_router)
     dp.include_router(admin_router)
+    dp.include_router(driver_router)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())

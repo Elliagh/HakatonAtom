@@ -1,10 +1,10 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram import types, F, Router
 from aiogram.types import Message
 
-from kb import admin_kb, change_info_kb
+from kb import admin_kb, change_info_kb, base_kb, cancel_kb
 from db import ManagerCars
 from db import Car
 import db
@@ -29,12 +29,30 @@ class ChangeCarInfo(StatesGroup):
 class DeleteCar(StatesGroup):
     car_license_plate = State()
 
+@admin_router.message(F.text == "Admin")
+async def admin_menu(msg: Message):
+
+    await msg.answer("Что хотите сделать", reply_markup=admin_kb)
+
+# Cancel
+
+@admin_router.message(F.text == "Отмена")
+async def cancel_action(msg: Message, state: FSMContext):
+    await state.clear()
+
+    await msg.answer("Действие отменено", reply_markup=admin_kb)
+
+@admin_router.message(F.text == "Back to base menu")
+async def back_to_menu(msg: Message):
+
+    await msg.answer("Возврат в главное меню", reply_markup=base_kb)
+
 # Add Car FSM
 
 @admin_router.message(F.text == "Add new car")
 async def start_add_car(msg: Message, state: FSMContext):
     await state.set_state(AddCar.license_plate)
-    await msg.answer("Напиши номерной знак машины", reply_markup=ReplyKeyboardRemove())
+    await msg.answer("Напиши номерной знак машины", reply_markup=cancel_kb)
 
 @admin_router.message(AddCar.license_plate)
 async def process_license_plate(msg: Message, state: FSMContext):
@@ -72,7 +90,8 @@ async def process_amount_of_fuel(msg: Message, state: FSMContext):
     kb = [
         [KeyboardButton(text="Каршеринг")],
         [KeyboardButton(text="Такси")],
-        [KeyboardButton(text="Доставка")]
+        [KeyboardButton(text="Доставка")],
+        [KeyboardButton(text="Отмена")]
     ]
 
     kb = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
@@ -87,7 +106,8 @@ async def process_type_of_car(msg: Message, state: FSMContext):
     kb = [
         [KeyboardButton(text="АИ-92")],
         [KeyboardButton(text="АИ-95")],
-        [KeyboardButton(text="АИ-100")]
+        [KeyboardButton(text="АИ-100")],
+        [KeyboardButton(text="Отмена")]
     ]
 
     kb = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
@@ -114,7 +134,7 @@ async def process_type_of_fuel(msg: Message, state: FSMContext):
 @admin_router.message(F.text == "Change car info")
 async def start_change_info(msg: Message, state: FSMContext):
     await state.set_state(ChangeCarInfo.car_license_plate)
-    await msg.answer("Напиши номерной знак машины, у которой вы хотите поменять имнформацию", reply_markup=ReplyKeyboardRemove())
+    await msg.answer("Напиши номерной знак машины, у которой вы хотите поменять имнформацию", reply_markup=cancel_kb)
 
 
 @admin_router.message(ChangeCarInfo.car_license_plate)
@@ -129,7 +149,7 @@ async def process_car_property(msg: Message, state: FSMContext):
     await state.update_data(car_property=msg.text)
     await state.set_state(ChangeCarInfo.car_new_value)
 
-    await msg.answer("Напиши новое значение", reply_markup=ReplyKeyboardRemove())
+    await msg.answer("Напиши новое значение", reply_markup=cancel_kb)
 
 @admin_router.message(ChangeCarInfo.car_new_value)
 async def process_new_value(msg: Message, state: FSMContext):
@@ -140,9 +160,11 @@ async def process_new_value(msg: Message, state: FSMContext):
     license_plate_car = data["license_plate"]
     car_property = data["car_property"]
     new_value = data["new_value"]
+
     connect = db.get_connection()
     manager_cars = db.ManagerCars(connect.connection_db)
     find_car = manager_cars.get_info_by_license_plate(license_plate_car)
+
     if car_property == "mileage" or car_property == "amount_of_fuel":
         pass
     else:
@@ -160,16 +182,19 @@ async def process_new_value(msg: Message, state: FSMContext):
 # Delete Car Info
 
 @admin_router.message(F.text == "Delete car")
-async def start_add_car(msg: Message, state: FSMContext):
+async def start_delete_car(msg: Message, state: FSMContext):
     await state.set_state(DeleteCar.car_license_plate)
 
-    await msg.answer("Напиши номерной знак машины", reply_markup=ReplyKeyboardRemove())
+    await msg.answer("Напиши номерной знак машины", reply_markup=cancel_kb)
 
 @admin_router.message(DeleteCar.car_license_plate)
 async def process_license_plate(msg: Message, state: FSMContext):
     await state.update_data(license_plate=msg.text)
     license_plate = await state.get_data()
+
     connect = db.get_connection()
     manager_cars = db.ManagerCars(connect.connection_db)
     manager_cars.delete_car(license_plate["license_plate"])
+
     await msg.answer("Машина удалена из базы данных", reply_markup=admin_kb)
+

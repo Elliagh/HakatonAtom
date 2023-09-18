@@ -30,6 +30,7 @@ class ConnectionBaseData:
 
 @dataclass
 class User:
+    id:int
     name: str
     surname: str
 
@@ -193,6 +194,46 @@ class ManagerCars:
 
 
 
+
+class AuntithicateUser:
+
+    def __init__(self, connection):
+        self.connection = connection
+
+    def login_user(self, name, password):
+        try:
+            string_query = f"""select * from driver where name = '{name}' and password = '{password}'"""
+            print(string_query)
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+                result = cursor.fetchone()
+                if result is not None:
+                    return True
+                else:
+                    return False
+        except Exception as _ex:
+            print("[INFO] something went wrong")
+
+    def login_user_as_admin(self, name, password):
+        try:
+            string_query = f"""select * from driver where name = '{name}' and password = '{password} and role = 'admin'"""
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+                result = cursor.fetchone()
+                if result is not None:
+                    return True
+                else:
+                    return False
+        except Exception as _ex:
+            print("[INFO] something went wrong")
+
+    def register_user(self, name, login, password):
+        try:
+            string_query = f"""insert into driver(name, surname, password, role) values('{name}', '{login}','{password}','user')"""
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+        except Exception as _ex:
+            print("[INFO] something went wrong")
 
 
 def get_connection():

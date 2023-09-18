@@ -9,6 +9,12 @@ cancel_capture_car = [
     [KeyboardButton(text="Diselect")]
 ]
 
+auth_menu = [
+    [KeyboardButton(text="Register")],
+    [KeyboardButton(text="Login")],
+    [KeyboardButton(text="LoginAsAdmin")]
+]
+
 admin_menu = [
     [KeyboardButton(text="Add new car")],
     [KeyboardButton(text="Change car info")],
@@ -30,6 +36,7 @@ base_menu = [
     [KeyboardButton(text="Admin")]
 ]
 
+auth_kb = ReplyKeyboardMarkup(keyboard=auth_menu, resize_keyboard=True)
 cancel_car_kb = ReplyKeyboardMarkup(keyboard=cancel_capture_car, resize_keyboard=True)
 user_kb = ReplyKeyboardMarkup(keyboard=user_menu, resize_keyboard=True)
 admin_kb = ReplyKeyboardMarkup(keyboard=admin_menu, resize_keyboard=True)

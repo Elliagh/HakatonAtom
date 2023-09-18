@@ -43,6 +43,8 @@ class Car:
     amount_of_fuel: int
     type_of_car: str
     type_of_fuel: str
+    busy: bool
+    temp_sign: str
 
 
 class ManagerCars:
@@ -54,9 +56,10 @@ class ManagerCars:
 
     def add_new_car(self, car: Car):
         try:
-            string_query = f"""INSERT INTO car (license_plate, model, year_of_realease, mileage, amount_of_fuel, type_of_car, type_of_fuel)
+            string_query = f"""INSERT INTO car (license_plate, model, year_of_realease, mileage, amount_of_fuel, type_of_car, type_of_fuel,
+                            busy, temp_sign)
                             VALUES('{car.license_plate}', '{car.model}', '{car.year_of_release}', 
-                                    {car.mileage}, {car.amount_of_fuel}, '{car.type_of_car}', '{car.type_of_fuel}');"""
+                                    {car.mileage}, {car.amount_of_fuel}, '{car.type_of_car}', '{car.type_of_fuel}', {car.busy}, '{car.temp_sign}');"""
             print(string_query)
             with self.connection.cursor() as cursor:
                 cursor.execute(string_query)
@@ -79,6 +82,7 @@ class ManagerCars:
     def get_info_by_license_plate(self, number_sign):
         try:
             string_query = f"select * from car where license_plate = '{number_sign}'"
+            print(string_query)
             with self.connection.cursor() as cursor:
                 cursor.execute(string_query)
                 raw_car = cursor.fetchone()
@@ -132,7 +136,9 @@ class ManagerCars:
             mileage=tuple_car[3],
             amount_of_fuel=tuple_car[4],
             type_of_car=tuple_car[5],
-            type_of_fuel=tuple_car[6]
+            type_of_fuel=tuple_car[6],
+            busy=tuple_car[7],
+            temp_sign=tuple_car[8]
         )
         return car
 
@@ -146,16 +152,46 @@ class ManagerCars:
         except Exception as _ex:
             print("[INFO] error delete car")
 
-    def capture_car(self, sign_number, is_busy):
+    def capture_car(self, sign_number):
         try:
             string_query = f"""
             update car
-            set busy = {is_busy}
-            where license_plate = '{sign_number}'"""
+            set busy = true
+            where license_plate = '{sign_number}' and busy = false"""
             with self.connection.cursor() as cursor:
                 cursor.execute(string_query)
         except Exception as _ex:
             print("[INFO] something went wrong")
+
+    def deselect_car(self, sign_number, password):
+        try:
+            string_query = f"""
+                        update car
+                        set busy = false
+                        where license_plate = '{sign_number}' and busy = true and temp_sign = password"""
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+                result = cursor.fetchone()
+                if result is not None:
+                    return True
+                else:
+                    return False
+        except Exception as _ex:
+            print("[INFO] something went wrong")
+
+    def add_secret(self, sign_number, secret):
+        try:
+            string_query = f"""
+                    update car
+                    set temp_sign = '{secret}'
+                    where license_plate = '{sign_number}'"""
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+        except Exception as _ex:
+            print("[INFO] something went wrong")
+
+
+
 
 
 

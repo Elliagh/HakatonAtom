@@ -1,6 +1,6 @@
 import random
 import string
-from datetime import datetime
+import datetime
 
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
@@ -62,10 +62,11 @@ async def process_license_plate(msg: Message, state: FSMContext):
     secret = generate_random_string(15)
     connect = db.get_connection()
     manager_cars = db.ManagerCars(connect.connection_db)
+    current_time = datetime.datetime.now()
     manager_cars.add_start_time(
         sign_number=data["license_plate"],
         id_user=id,
-        time=convert_to_postgresql_datetime(datetime.datetime.now())
+        time=str(str(current_time.day) + ":"+ str(current_time.hour) + ":" + str(current_time.minute))
     )
     car = manager_cars.get_info_by_license_plate(data["license_plate"])
     manager_cars.capture_car(data["license_plate"])
@@ -95,10 +96,11 @@ async def diselect_car(msg: Message, state: FSMContext):
     print(data)
     connect = db.get_connection()
     manager_cars = db.ManagerCars(connect.connection_db)
+    current_time = datetime.datetime.now()
     manager_cars.add_end_time(
         sign_number=data["license_plate"],
         id = id,
-        time=convert_to_postgresql_datetime(datetime.datetime.now())
+        time=str(str(current_time.day) + ":"+ str(current_time.hour) + ":" + str(current_time.minute))
     )
     result = manager_cars.deselect_car(data["license_plate"], password=data["password"])
     if result == False:
@@ -134,6 +136,3 @@ def generate_random_string(length):
     letters = string.ascii_lowercase
     rand_string = ''.join(random.choice(letters) for i in range(length))
     return rand_string
-
-def convert_to_postgresql_datetime(timestamp):
-    return datetime.strftime(timestamp, '%Y-%m-%d %H:%M:%S')

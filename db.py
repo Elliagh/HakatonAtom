@@ -195,7 +195,7 @@ class ManagerCars:
     def add_start_time(self, sign_number, id_user, time):
         try:
             string_query =f"""insert into user_car(driver_id, license_plate, start_drive, end_drive)
-                    values ({id_user}, '{sign_number}','{time}', '{time}')"""
+                    values ({id_user},'{sign_number}','{time}','{time}')"""
             with self.connection.cursor() as cursor:
                 cursor.execute(string_query)
         except Exception as _ex:

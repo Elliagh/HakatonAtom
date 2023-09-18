@@ -192,6 +192,26 @@ class ManagerCars:
         except Exception as _ex:
             print("[INFO] something went wrong")
 
+    def add_start_time(self, sign_number, id_user, time):
+        try:
+            string_query =f"""insert into user_car(driver_id, license_plate, start_drive, end_drive)
+                    values ({id_user}, '{sign_number}','{time}', '{time}')"""
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+        except Exception as _ex:
+            print("[INFO] something went wrong")
+
+    def add_end_time(self, sign_number, id_user, time):
+        try:
+            string_query =f"""update user_car
+                    set end_drive ='{time}',
+                    where license_plate='{sign_number}'"""
+            with self.connection.cursor() as cursor:
+                cursor.execute(string_query)
+        except Exception as _ex:
+            print("[INFO] something went wrong")
+
+
 
 
 
@@ -209,9 +229,9 @@ class AuntithicateUser:
                 cursor.execute(string_query)
                 result = cursor.fetchone()
                 if result is not None:
-                    return True
+                    return result[0]
                 else:
-                    return False
+                    return None
         except Exception as _ex:
             print("[INFO] something went wrong")
 

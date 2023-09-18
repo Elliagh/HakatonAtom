@@ -1,80 +1,166 @@
 import asyncio
 import random
 from typing import List
+import struct
 
 import can
 from can.notifier import MessageRecipient
 
 
-current_engine_rpm = 2000
-current_vehicle_speed = 40
+ENGINE_PGN = 0xF004
+DISPLAY_PGN = 0xFEFC
+
+class SimulationManager():
+
+    def __init__(self) -> None:
+        self.active_simulations_list = {}
+
+    async def add_simulation(self, driver_id: int, simulation):
+        self.active_simulations_list[driver_id] = simulation
+
+        loop = asyncio.get_event_loop()
+        await simulation.run_simulation()
+
+    async def get_simulation_info(self, driver_id: int):
+        pass
+
+    async def stop_simulation(self, driver_id):
+        sim = self.active_simulations_list[driver_id]
+
+        sim.is_running_simulation = False
+
+
+class Simulation():
+
+    def __init__(self, simulation_number, fuel_level) -> None:
+        self.is_running_simulation = True
+        
+        self.simulaiton_number = simulation_number
+        self.fuel = fuel_level
+        self.car_speed = 40
+
+        self.bus = can.Bus(interface="virtual", channel="can0", receive_own_messages=True)
+        self.reader = can.AsyncBufferedReader()
+
+        self.listeners: List[MessageRecipient] = [
+            self.on_message,  # Callback function
+            self.reader,  # AsyncBufferedReader() listener
+        ]
+
+        loop = asyncio.get_event_loop()
+        self.notifier = can.Notifier(self.bus, self.listeners, loop=loop)
+
+    async def on_message(self, msg):
+        # Printe incoming messages in console
+        await self.update_info(msg)
+
+        print(msg)
+
+    async def update_info(self, msg: can.Message):
+
+        if msg.arbitration_id == ENGINE_PGN:
+            
+            encoded_data = bytes(msg.data)
+
+            engine_decoded_data = struct.unpack("IBBHBIB", encoded_data)
+
+            self.car_speed = engine_decoded_data[3] # Скорость
+
+        elif msg.arbitration_id == DISPLAY_PGN:
+
+            encoded_data = bytes(msg.data)
+
+            display_decoded_data = struct.unpack("BBBBH", encoded_data)
+
+            self.car_speed = display_decoded_data[1] # Топливо
+    
+    async def run_simulation(self):
+        
+        while self.is_running_simulation:
+            await self.write_info_from_display()
+            await self.write_info_from_engine()
+
+            await asyncio.sleep(1)
+
+        self.notifier.stop()
+        self.bus.shutdown()
+
+    async def return_info_to_manager(self):
+        data = {'fuel': self.fuel,
+                'car_speed': self.car_speed}
+        
+        return data
+        
+    async def write_info_from_engine(self):
+        
+        pgn = ENGINE_PGN
+
+        delta_vehicle_speed = int(random.uniform(-5, 5))
+
+        self.car_speed += delta_vehicle_speed
+
+        if self.car_speed > 60:
+            self.car_speed = 60
+        elif self.car_speed < 40:
+            self.car_speed = 40
+
+        
+        data = [
+            0, #  Engine Torque Mode
+            0, # Driver's Demand Engine - Percent Torque
+            0, # Actual Engine - Percent Torque
+            self.car_speed, # Engine Speed
+            0, # Source Address of Controlling Device for Engine Control
+            0, # Engine Starter Mode
+            0, # Engine Demand - Percent Torque
+        ]
+
+        encoded_data = struct.pack("IBBHBIB", *data)
+
+        #Placeholder
+        message = can.Message(arbitration_id=pgn, data=encoded_data)
+
+        self.bus.send(message)
+
+    async def write_info_from_display(self):
+        
+        # Определяем PGN (Parameter Group Number) для отправки данных
+        pgn = DISPLAY_PGN
+
+        chance_to_change_fuel = random.randint(1, 3)
+
+        if chance_to_change_fuel == 3:
+            self.fuel -= 1
+
+        print(self.fuel)
+        
+        data = [
+            0, # Washer fluid level
+            self.fuel, # Fuel Level
+            0, # Fuel Filter Differential Pressure
+            0, # Engine Oil Filter Differential Pressure
+            0, # Cargo Ambient Temperature
+        ]
+
+        encoded_data = struct.pack("BBBBH", *data)
+
+        #Placeholder
+        message = can.Message(arbitration_id=pgn, data=encoded_data)
+
+        self.bus.send(message)
+        
+    
 
 def print_message(msg: can.Message) -> None:
     """Regular callback function. Can also be a coroutine."""
-    print(msg)
-
-async def send_vehicle_data(bus):
-    global current_engine_rpm, current_vehicle_speed
-
-    # Генерируем случайное изменение состояния машины
-    delta_engine_rpm = random.randint(-50, 50)
-    delta_vehicle_speed = random.uniform(-5, 5)
-    delta_vehicle_fuel = random.uniform(0, 0.3)
-    # ...
-
-    # Обновляем значения состояния машины с плавным изменением
-    current_engine_rpm += delta_engine_rpm
-    current_vehicle_speed += delta_vehicle_speed
-
-    # Проверяем максимальную скорость автомобиля
-    if current_vehicle_speed > 60:
-        current_vehicle_speed = 60
-    elif current_vehicle_speed < 40:
-        current_vehicle_speed = 40
-
-    # Определяем PGN (Parameter Group Number) для отправки данных
-    pgn = 0x1234  # Замените на соответствующий PGN
-
-    # Формируем сообщение для отправки
-    message = can.Message(arbitration_id=pgn, data=bytearray([int(current_vehicle_speed), 3]))
-
-    # Отправляем сообщение
-    bus.send(message)
+    print(msg.data)
 
 
-async def main() -> None:
-    """The main function that runs in the loop."""
+sim_manager = SimulationManager()
 
-    with can.Bus(
-        interface="virtual", channel="my_channel_0", receive_own_messages=True
-    ) as bus:
-        reader = can.AsyncBufferedReader()
-        logger = can.Logger("logfile.asc")
-
-        listeners: List[MessageRecipient] = [
-            print_message,  # Callback function
-            reader,  # AsyncBufferedReader() listener
-            logger,  # Regular Listener object
-        ]
-        # Create Notifier with an explicit loop to use for scheduling of callbacks
-        loop = asyncio.get_running_loop()
-        notifier = can.Notifier(bus, listeners, loop=loop)
-        # Start sending first message
-        
-        while True:
-
-            await send_vehicle_data(bus)
-
-            await asyncio.sleep(0.5)
-
-            message = await reader.get_message()
-
-        # Wait for last message to arrive
-        await reader.get_message()
-        print("Done!")
-
-        # Clean-up
-        notifier.stop()
+async def main():
+    simulation = Simulation(1, 50)
+    await sim_manager.add_simulation(1, simulation)
 
 
 if __name__ == "__main__":

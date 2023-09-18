@@ -112,7 +112,7 @@ async def process_type_of_fuel(msg: Message, state: FSMContext):
 # Change Info FSM
 
 @admin_router.message(F.text == "Change car info")
-async def start_add_car(msg: Message, state: FSMContext):
+async def start_change_info(msg: Message, state: FSMContext):
     await state.set_state(ChangeCarInfo.car_license_plate)
     await msg.answer("Напиши номерной знак машины, у которой вы хотите поменять имнформацию", reply_markup=ReplyKeyboardRemove())
 

@@ -18,17 +18,6 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters import Command
 
 driver_router = Router()
-current_driver = db.User(-1, "test", "qwerty")
-
-class RegisterUser(StatesGroup):
-    name = State()
-    surname = State()
-    password = State()
-
-
-class LoginUser(StatesGroup):
-    name = State()
-    password = State()
 
 class SelectCar(StatesGroup):
     license_plate = State()
@@ -63,11 +52,6 @@ async def process_license_plate(msg: Message, state: FSMContext):
     connect = db.get_connection()
     manager_cars = db.ManagerCars(connect.connection_db)
     current_time = datetime.datetime.now()
-    manager_cars.add_start_time(
-        sign_number=data["license_plate"],
-        id_user=id,
-        time=str(str(current_time.day) + ":"+ str(current_time.hour) + ":" + str(current_time.minute))
-    )
     car = manager_cars.get_info_by_license_plate(data["license_plate"])
     manager_cars.capture_car(data["license_plate"])
     manager_cars.add_secret(data["license_plate"], secret)
@@ -97,11 +81,6 @@ async def diselect_car(msg: Message, state: FSMContext):
     connect = db.get_connection()
     manager_cars = db.ManagerCars(connect.connection_db)
     current_time = datetime.datetime.now()
-    manager_cars.add_end_time(
-        sign_number=data["license_plate"],
-        id = id,
-        time=str(str(current_time.day) + ":"+ str(current_time.hour) + ":" + str(current_time.minute))
-    )
     result = manager_cars.deselect_car(data["license_plate"], password=data["password"])
     if result == False:
         await  msg.answer("wrong secret", reply_markup=cancel_car_kb)

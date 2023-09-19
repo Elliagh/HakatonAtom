@@ -44,6 +44,7 @@ async def process_license_plate(msg: Message, state: FSMContext):
     await state.update_data(license_plate=msg.text)
     data = await state.get_data()
     await state.clear()
+
     secret = generate_random_string(15)
     connect = db.get_connection()
     manager_cars = db.ManagerCars(connect.connection_db)
@@ -53,7 +54,7 @@ async def process_license_plate(msg: Message, state: FSMContext):
 
     await msg.answer(info_about_car(car) + "\n" + "pass:" + secret, reply_markup=cancel_car_kb)
 
-    simulation = Simulation(1, 100)
+    simulation = Simulation(1, car.amount_of_fuel)
     await sim_manager.add_simulation(msg.from_user.id, simulation)
 
 

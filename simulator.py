@@ -126,12 +126,14 @@ class Simulation():
         # Определяем PGN (Parameter Group Number) для отправки данных
         pgn = DISPLAY_PGN
 
-        chance_to_change_fuel = random.randint(1, 3)
+        chance_to_change_fuel = random.randint(1, 20)
 
         if chance_to_change_fuel == 3:
             self.fuel -= 1
 
-        print(self.fuel)
+        if self.fuel < 20:
+            self.fuel = 20
+
         
         data = [
             0, # Washer fluid level

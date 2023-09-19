@@ -84,7 +84,7 @@ async def diselect_car(msg: Message, state: FSMContext):
     else:
         await  msg.answer("it is all", reply_markup=base_kb)
 
-        sim_manager.stop_simulation(msg.from_user.id)
+        await sim_manager.stop_simulation(msg.from_user.id)
 
 
 @driver_router.message(F.text == "Show List available cars")

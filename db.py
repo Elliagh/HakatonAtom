@@ -78,6 +78,7 @@ class ManagerCars:
                 return result_cars
         except Exception as _ex:
             print("[INFO] error to get cars")
+            print(_ex)
 
     def get_info_by_license_plate(self, number_sign):
         try:
